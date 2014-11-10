@@ -4,6 +4,7 @@ import com.pieuw.avalanche.util.SystemUiHider;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -113,6 +114,7 @@ public class Mainmenu extends Activity {
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
         findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
+        findViewById(R.id.dummy_button).setOnClickListener(startGame);
     }
 
     @Override
@@ -139,6 +141,17 @@ public class Mainmenu extends Activity {
             }
             return false;
         }
+    };
+    
+    View.OnClickListener startGame = new View.OnClickListener() {
+    	@Override
+    	public void onClick(View v) {
+    		if (v.equals(findViewById(R.id.dummy_button))) {
+    			Intent intent = new Intent(Mainmenu.this, MainGame.class);
+        		Mainmenu.this.startActivity(intent);
+    		}
+    		
+    	}
     };
 
     Handler mHideHandler = new Handler();
