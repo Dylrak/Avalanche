@@ -6,9 +6,5 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="title_activity_main_game">MainGame</string>
     <string name="hello_world">Hello world!</string>
-    <string name="start_game">Start Game</string>
-    <string name="store">Store</string>
-    <string name="options">Options</string>
-    <string name="pieuw">PIEUW!</string>
 
 </resources>
