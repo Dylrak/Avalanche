@@ -4,30 +4,58 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 import android.content.Context;
 import android.graphics.Paint;
 import android.graphics.Color;
 import android.graphics.Canvas;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 
 
-public class MainGame extends Activity {
+public class MainGame extends Activity implements SensorEventListener{
 
-	GameView gameView;
-	Paint paint = new Paint();
+	private Paint paint = new Paint();
 	private float x = 100;
 	private float y = 200;
-	int radius = 50;
+	private String turn = "null";
+	private int radius = 50;
+	private SensorManager sensorManager;
+	Sensor accelerometer;
+	Toast toast;
 	
-	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(new GameView(this));
-		paint.setColor(Color.BLUE);
+		sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+		accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 	}
 	
-	class GameView extends View {
+	protected void onResume() {
+        super.onResume();
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+     }
+
+    protected void onPause() {
+        super.onPause();
+        sensorManager.unregisterListener(this);
+    }    
+	
+	public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+
+    public void onSensorChanged(SensorEvent event) {
+    	x -= event.values[0] * 2;
+    	y += event.values[1] * 2;
+    }
+    
+    class GameView extends View {
+	    
 		public GameView(Context context) {
 			super(context);
+			paint.setColor(Color.BLUE);
 		}
 		
 		@Override
@@ -35,12 +63,5 @@ public class MainGame extends Activity {
             c.drawCircle(x, y, radius, paint);
             invalidate();
         }
-		
-		@Override
-		public boolean onTouchEvent(MotionEvent event) {
-			x = event.getX();
-			y = event.getY();
-			return true;
-		}
 	}
 }
