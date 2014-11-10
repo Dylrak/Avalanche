@@ -89,10 +89,18 @@ public class MainGame extends Activity implements SensorEventListener{
     };
     
  	private void Move() {
- 		if (angle < -3) {
- 			x += 1.5F;
- 		} else if (angle > 3) {
- 			x -= 1.5F;
+ 		if (angle < -1.5 || angle > 1.5) {
+ 			float speed = angle;
+ 			if (angle > 8) {
+ 				speed = 8;
+ 			}
+ 			x -= speed;
+ 			if (x <= 0 - radius / 2) {
+ 				x = width - radius / 2;
+ 			}
+ 			else if (x >= width - radius / 2) {
+ 				x = 0 - radius / 2;
+ 			}
  		}
  	}
  
@@ -100,16 +108,13 @@ public class MainGame extends Activity implements SensorEventListener{
     	startJump++;
     	jumping = true;
     	jumped = false;
-    	if (startJump > 60) {
+    	if (startJump >= 200) {
     		startJump = 0;
     		jumping = false;
     		jumped = true;
     	}
-    	else if (startJump > 30) {
-    		y += 1.5F;
-    	} 
     	else {
-    		y -= 1.5F;
+    		y -= -0.2372 * startJump + 23.72;
     	}
     }
     
