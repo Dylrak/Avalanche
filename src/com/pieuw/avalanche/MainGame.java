@@ -11,10 +11,14 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Paint;
 import android.graphics.Color;
 import android.graphics.Canvas;
 import android.graphics.Point;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -23,7 +27,7 @@ import android.hardware.SensorManager;
 
 public class MainGame extends Activity implements SensorEventListener{
 
-	private Paint paint = new Paint();
+	
 	private float x, y, angle;
 	private int startJump;
 	private int radius = 50;
@@ -35,6 +39,8 @@ public class MainGame extends Activity implements SensorEventListener{
 	int width, height;
 	boolean jumping = false, jumped = false;
 	Handler jumpTimer;
+	
+	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +57,7 @@ public class MainGame extends Activity implements SensorEventListener{
 		jumpTimer = new Handler();
 		startJump = 0;
 		jumpTimer.postDelayed(runnableMove, 10);
+		
 	}
 	
 	protected void onResume() {
@@ -119,7 +126,9 @@ public class MainGame extends Activity implements SensorEventListener{
     }
     
     class GameView extends View {
-	    
+    	private Bitmap background = BitmapFactory.decodeResource(getResources(), R.drawable.background);
+    	private Rect endSize = new Rect();
+    	private Paint paint = new Paint();
 		public GameView(Context context) {
 			super(context);
 			paint.setColor(Color.BLUE);
@@ -127,6 +136,8 @@ public class MainGame extends Activity implements SensorEventListener{
 		
 		@Override
 		protected void onDraw(Canvas c) {
+			endSize.set(0, (int) (height - y), width, (int) (height + y));
+            c.drawBitmap(background, null, endSize, null);
             c.drawCircle(x, y, radius, paint);
             invalidate();
         }
