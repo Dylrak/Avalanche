@@ -1,5 +1,7 @@
 package com.pieuw.avalanche;
 
+import java.util.ArrayList;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -38,9 +40,9 @@ public class MainGame extends Activity implements SensorEventListener{
 	Point size = new Point();
 	int width, height;
 	boolean jumping = false, jumped = false;
-	Handler jumpTimer;
-	
-	
+	Handler timer;
+	ArrayList<Cube> cubes = new ArrayList<Cube>();
+	Random random = new Random();
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -54,10 +56,10 @@ public class MainGame extends Activity implements SensorEventListener{
 		width = size.x;
 		x = (width - radius) / 2;
 		y = height - radius;
-		jumpTimer = new Handler();
+		timer = new Handler();
 		startJump = 0;
-		jumpTimer.postDelayed(runnableMove, 10);
-		
+		timer.postDelayed(runnableMove, 10);
+		timer.postDelayed(runnableSpawnCube, 2000);
 	}
 	
 	protected void onResume() {
@@ -80,9 +82,9 @@ public class MainGame extends Activity implements SensorEventListener{
     	   @Override
     	   public void run() {
     	      Jump();
-    	      jumpTimer.postDelayed(this, 10);
+    	      timer.postDelayed(this, 10);
     	      if (jumped) {
-    	    	  jumpTimer.removeCallbacks(runnableJump);
+    	    	  timer.removeCallbacks(runnableJump);
     	      }
     	   }
     };
@@ -90,10 +92,46 @@ public class MainGame extends Activity implements SensorEventListener{
     private Runnable runnableMove = new Runnable() {
  	   		@Override
  	   		public void run() {
- 	   		Move();
- 	   		jumpTimer.postDelayed(this, 10);
+ 	   			Move();
+ 	   			MoveCube();
+ 	   			timer.postDelayed(this, 10);
  	   }
     };
+    
+    private Runnable runnableSpawnCube = new Runnable() {
+	   		@Override
+	   		public void run() {
+	   			SpawnCube();
+	   			timer.postDelayed(this, 5000);
+	   }
+    };
+    
+    private void SpawnCube() {
+    	int size = random.nextInt(100 - 80) + 80;
+    	int position = random.nextInt(width - size - 5) + 5;
+    	cubes.add(new Cube(position, size, size, size));
+    }
+    
+    private void MoveCube() {
+    	int index = 0;
+    	for (Cube cube:cubes) {
+    		boolean collisionCube = false;
+    		int index1 = 0;
+    		for (Cube collision:cubes) {
+    			if (cube.intersect(collision) && (index != index1)) {
+    				collisionCube = true;
+    			}
+    			index1++;
+    		}
+    		if (!collisionCube && cube.cubeY < height - cube.cubeWidth) {
+    			cube.cubeY += 10;
+    			if (cube.cubeY > height - cube.cubeHeight) {
+    				cube.cubeY = height - cube.cubeHeight;
+    			}
+    		}
+    		index++;
+    	}
+    }
     
  	private void Move() {
  		if (angle < -1.5 || angle > 1.5) {
@@ -126,19 +164,21 @@ public class MainGame extends Activity implements SensorEventListener{
     }
     
     class GameView extends View {
-    	private Bitmap background = BitmapFactory.decodeResource(getResources(), R.drawable.background);
-    	private Rect endSize = new Rect();
-    	private Paint paint = new Paint();
+    	Paint paintUser = new Paint();
+    	Paint paintCube = new Paint();
 		public GameView(Context context) {
 			super(context);
-			paint.setColor(Color.BLUE);
+			paintUser.setColor(Color.BLUE);
+			paintCube.setColor(Color.RED);
 		}
 		
 		@Override
 		protected void onDraw(Canvas c) {
-			endSize.set(0, (int) (height - y), width, (int) (height + y));
-            c.drawBitmap(background, null, endSize, null);
-            c.drawCircle(x, y, radius, paint);
+			for (Cube cube: cubes) {
+				c.drawCircle(cube.cubeX, cube.cubeY, cube.cubeWidth, paintCube);
+			}
+            c.drawCircle(x, y, radius, paintUser);
+            
             invalidate();
         }
 		
@@ -146,10 +186,38 @@ public class MainGame extends Activity implements SensorEventListener{
 		public boolean onTouchEvent(MotionEvent event) {
 			if (event.getAction() == MotionEvent.ACTION_DOWN) {
 	    		if (!jumping) {
-	        		jumpTimer.postDelayed(runnableJump, 10);
+	        		timer.postDelayed(runnableJump, 10);
 	    		}
 	    	}
 			return true;
 		}
 	}
+    
+    public class Cube {
+    	int cubeX = 0, cubeY = 0, cubeWidth = 0, cubeHeight = 0;
+    	public Cube(int startX, int startY, int sizeX, int sizeY) {
+    		cubeWidth = sizeX;
+    		cubeHeight = sizeY;
+    		cubeX = startX;
+    		cubeY = startY;
+    	}
+    	
+    	public boolean intersect(Cube cube) {
+    		boolean intersected = false;
+    		if (cubeY + cubeHeight * 2 >= cube.cubeY) {
+    			int xLeft = cubeX;
+    			int xMiddle = cubeX + cubeWidth;
+    			int xRight = cubeX + cubeWidth * 2;
+    			for(int i = 0; i < cube.cubeWidth * 2; i++){
+        			if (xLeft == cube.cubeX + i || 
+        					xMiddle == cube.cubeX + i || 
+        					xRight == cube.cubeX + i) 
+        			{
+        				intersected = true;
+        			}
+        		}
+			}
+			return intersected;
+    	}
+    }
 }
