@@ -107,6 +107,11 @@ public class MainGame extends Activity implements SensorEventListener{
     };
     
     private void SpawnCube() {
+    	int i = random.nextInt(10) + 1;
+    	String randBlock = "block_" + i;
+    	int resID = getResources().getIdentifier(randBlock, "drawable", getPackageName());
+    	Bitmap block = BitmapFactory.decodeResource(getResources(), resID);
+    	
     	int size = random.nextInt(100 - 80) + 80;
     	int position = random.nextInt(width - size - 5) + 5;
     	cubes.add(new Cube(position, size, size, size));
@@ -175,7 +180,8 @@ public class MainGame extends Activity implements SensorEventListener{
 		@Override
 		protected void onDraw(Canvas c) {
 			for (Cube cube: cubes) {
-				c.drawCircle(cube.cubeX, cube.cubeY, cube.cubeWidth, paintCube);
+				/*Can't parse "block" from SpawnCube to here. Please fix.*/
+				c.drawBitmap(block, cube.cubeX, cube.cubeY, paintCube);
 			}
             c.drawCircle(x, y, radius, paintUser);
             
