@@ -2,8 +2,6 @@ package com.pieuw.avalanche;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -19,8 +17,6 @@ import android.graphics.Paint;
 import android.graphics.Color;
 import android.graphics.Canvas;
 import android.graphics.Point;
-import android.graphics.Rect;
-import android.graphics.RectF;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -107,14 +103,14 @@ public class MainGame extends Activity implements SensorEventListener{
     };
     
     private void SpawnCube() {
-    	int i = random.nextInt(10) + 1;
+    	int i = random.nextInt(5) + 1;
     	String randBlock = "block_" + i;
     	int resID = getResources().getIdentifier(randBlock, "drawable", getPackageName());
     	Bitmap block = BitmapFactory.decodeResource(getResources(), resID);
     	
     	int size = random.nextInt(100 - 80) + 80;
     	int position = random.nextInt(width - size - 5) + 5;
-    	cubes.add(new Cube(position, size, size, size));
+    	cubes.add(new Cube(position, size, size, size, block));
     }
     
     private void MoveCube() {
@@ -123,8 +119,10 @@ public class MainGame extends Activity implements SensorEventListener{
     		boolean collisionCube = false;
     		int index1 = 0;
     		for (Cube collision:cubes) {
-    			if (cube.intersect(collision) && (index != index1)) {
-    				collisionCube = true;
+    			if (index != index1) {
+    				if (cube.intersect(collision)) {
+        				collisionCube = true;
+        			}
     			}
     			index1++;
     		}
@@ -179,12 +177,12 @@ public class MainGame extends Activity implements SensorEventListener{
 		
 		@Override
 		protected void onDraw(Canvas c) {
+			c.drawColor(Color.WHITE);
 			for (Cube cube: cubes) {
 				/*Can't parse "block" from SpawnCube to here. Please fix.*/
-				c.drawBitmap(block, cube.cubeX, cube.cubeY, paintCube);
+				c.drawBitmap(cube.block, cube.cubeX, cube.cubeY, paintCube);
 			}
             c.drawCircle(x, y, radius, paintUser);
-            
             invalidate();
         }
 		
@@ -201,20 +199,22 @@ public class MainGame extends Activity implements SensorEventListener{
     
     public class Cube {
     	int cubeX = 0, cubeY = 0, cubeWidth = 0, cubeHeight = 0;
-    	public Cube(int startX, int startY, int sizeX, int sizeY) {
+    	Bitmap block;
+    	public Cube(int startX, int startY, int sizeX, int sizeY, Bitmap image) {
     		cubeWidth = sizeX;
     		cubeHeight = sizeY;
     		cubeX = startX;
     		cubeY = startY;
+    		block = image;
     	}
     	
     	public boolean intersect(Cube cube) {
     		boolean intersected = false;
-    		if (cubeY + cubeHeight * 2 >= cube.cubeY) {
+    		if (cubeY + cubeHeight >= cube.cubeY) {
     			int xLeft = cubeX;
-    			int xMiddle = cubeX + cubeWidth;
-    			int xRight = cubeX + cubeWidth * 2;
-    			for(int i = 0; i < cube.cubeWidth * 2; i++){
+    			int xMiddle = cubeX + cubeWidth / 2;
+    			int xRight = cubeX + cubeWidth;
+    			for(int i = 0; i < cube.cubeWidth; i++){
         			if (xLeft == cube.cubeX + i || 
         					xMiddle == cube.cubeX + i || 
         					xRight == cube.cubeX + i) 
