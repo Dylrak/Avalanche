@@ -14,8 +14,8 @@
         android:layout_above="@+id/loadout"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/logo"
-        android:text="@string/start_game" />
+        android:text="@string/start_game" 
+        android:background="@drawable/button"/>
     
     <Button
         android:id="@+id/loadout"
@@ -24,7 +24,8 @@
         android:layout_above="@+id/options"
         android:layout_alignParentRight="true"
         android:layout_alignParentLeft="true"
-        android:text="@string/loadout" />
+        android:text="@string/loadout" 
+        android:background="@drawable/button"/>
 
     <Button
         android:id="@+id/options"
@@ -33,7 +34,8 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentLeft="true"
         android:layout_above="@+id/store"
-        android:text="@string/options" />
+        android:text="@string/options" 
+        android:background="@drawable/button"/>
 
     <Button
         android:id="@+id/store"
@@ -42,7 +44,8 @@
         android:layout_above="@+id/money"
         android:layout_alignParentRight="true"
         android:layout_alignParentLeft="true"
-        android:text="@string/store" />
+        android:text="@string/store" 
+        android:background="@drawable/button"/>
     
     <RelativeLayout
         android:id="@+id/money"
@@ -92,12 +95,14 @@
 
     <ImageView
         android:id="@+id/logo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_above="@id/start_game"
+        android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:scaleType="fitCenter"
+    	android:adjustViewBounds="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:scaleType="centerCrop"
         android:src="@drawable/logo" />
     
 </RelativeLayout>
