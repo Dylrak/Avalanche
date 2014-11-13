@@ -9,6 +9,7 @@
     <string name="start_game">Start Game</string>
     <string name="store">Store</string>
     <string name="options">Options</string>
-    <string name="pieuw">PIEUW!</string>
+    <string name="loadout">Loadout</string>
+    <string name="coins">50</string>
 
 </resources>
