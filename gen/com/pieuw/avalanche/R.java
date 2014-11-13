@@ -28,16 +28,25 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int block_3=0x7f020003;
         public static final int block_4=0x7f020004;
         public static final int block_5=0x7f020005;
-        public static final int floor=0x7f020006;
-        public static final int ic_launcher=0x7f020007;
+        public static final int coinstack_icon=0x7f020006;
+        public static final int floor=0x7f020007;
+        public static final int ic_launcher=0x7f020008;
+        public static final int logo=0x7f020009;
+        public static final int rounded_layout=0x7f02000a;
+        public static final int stick=0x7f02000b;
     }
     public static final class id {
-        public static final int anchor_1=0x7f070005;
+        public static final int anchor_1=0x7f070008;
+        public static final int anchor_2=0x7f070007;
+        public static final int coins=0x7f070009;
+        public static final int coinstack_icon=0x7f07000a;
         public static final int fullscreen_content=0x7f070000;
-        public static final int options=0x7f070003;
-        public static final int pieuw=0x7f070002;
+        public static final int loadout=0x7f070002;
+        public static final int logo=0x7f070003;
+        public static final int money=0x7f070006;
+        public static final int options=0x7f070004;
         public static final int start_game=0x7f070001;
-        public static final int store=0x7f070004;
+        public static final int store=0x7f070005;
     }
     public static final class layout {
         public static final int activity_main_game=0x7f030000;
@@ -45,11 +54,12 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
     }
     public static final class string {
         public static final int app_name=0x7f050000;
+        public static final int coins=0x7f050009;
         public static final int dummy_button=0x7f050001;
         public static final int dummy_content=0x7f050002;
         public static final int hello_world=0x7f050004;
+        public static final int loadout=0x7f050008;
         public static final int options=0x7f050007;
-        public static final int pieuw=0x7f050008;
         public static final int start_game=0x7f050005;
         public static final int store=0x7f050006;
         public static final int title_activity_main_game=0x7f050003;

@@ -12,9 +12,7 @@ import android.view.View;
 import android.widget.Toast;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
-import android.graphics.Paint;
 import android.graphics.Color;
 import android.graphics.Canvas;
 import android.graphics.Point;
@@ -27,9 +25,8 @@ import android.hardware.SensorManager;
 public class MainGame extends Activity implements SensorEventListener{
 
 	
-	private float x, y, angle;
+	private float x, angle;
 	private int startJump;
-	private int radius = 50;
 	private SensorManager sensorManager;
 	Sensor accelerometer;
 	Toast toast;
@@ -41,8 +38,10 @@ public class MainGame extends Activity implements SensorEventListener{
 	ArrayList<Cube> cubes = new ArrayList<Cube>();
 	Random random = new Random();
 	int position;
-	int startPosition;
-	int jumpMilliSeconds = 1000;
+	int jumpMilliSeconds;
+	int userWidth, userHeight;
+	Bitmap pixelMap;
+	float userSpeed = 0, cubeSpeed = 0;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +49,8 @@ public class MainGame extends Activity implements SensorEventListener{
 		display.getSize(size);
 		height = size.y;
 		width = size.x;
+		userWidth = 100;
+		userHeight = 150;
 		super.onCreate(savedInstanceState);
 		setContentView(new GameView(this));
 		sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
@@ -58,15 +59,16 @@ public class MainGame extends Activity implements SensorEventListener{
 		display.getSize(size);
 		height = size.y;
 		width = size.x;
-		x = (width - radius) / 2;
-		y = height - radius;
+		x = (width - userWidth) / 2;
 		timer = new Handler();
 		startJump = 0;
+		jumpMilliSeconds = 500;
 		timer.postDelayed(runnableMove, 10);
 		timer.postDelayed(runnableSpawnCube, 2000);
-		timer.postDelayed(runnableCubeMove, 50);
+		timer.postDelayed(runnableCubeMove, 10);
 		position = 0;
-		startPosition = position;
+		userSpeed = 20.0F;
+		cubeSpeed = 10.0F;
 	}
 	
 	protected void onResume() {
@@ -100,6 +102,7 @@ public class MainGame extends Activity implements SensorEventListener{
  	   		@Override
  	   		public void run() {
  	   			Move();
+ 	   			Fall();
  	   			timer.postDelayed(this, 10);
  	   }
     };
@@ -126,7 +129,7 @@ public class MainGame extends Activity implements SensorEventListener{
     	int resID = getResources().getIdentifier(randBlock, "drawable", getPackageName());
     	Bitmap block = BitmapFactory.decodeResource(getResources(), resID);
     	
-    	int size = random.nextInt(300 - 100) + 100;
+    	int size = random.nextInt(500 - 300) + 300;
     	int positionX = random.nextInt(width - size - 5) + 5;
     	cubes.add(new Cube(positionX, position + height + size, size, size, block));
     }
@@ -145,7 +148,7 @@ public class MainGame extends Activity implements SensorEventListener{
     			index1++;
     		}
     		if (!cube.collisionCube && cube.cubeY > height / 3 + cube.cubeHeight) {
-    			cube.cubeY -= 10;
+    			cube.cubeY -= cubeSpeed;
     			if (cube.cubeY < height / 3 + cube.cubeHeight) {
     				cube.cubeY = height / 3 + cube.cubeHeight;
     			}
@@ -161,51 +164,118 @@ public class MainGame extends Activity implements SensorEventListener{
  				speed = 8;
  			}
  			x -= speed;
- 			if (x <= 0 - radius / 2) {
- 				x = width - radius / 2;
+ 			if (x <= 0 - userWidth / 2) {
+ 				x = width - userWidth / 2;
  			}
- 			else if (x >= width - radius / 2) {
- 				x = 0 - radius / 2;
+ 			else if (x >= width - userWidth / 2) {
+ 				x = 0 - userWidth / 2;
  			}
  		}
  	}
- 
+ 	
     private void Jump() {
     	startJump++;
     	jumping = true;
     	jumped = false;
+    	userSpeed = 20.0F;
     	if (startJump >= jumpMilliSeconds / 10) {
     		startJump = 0;
     		jumping = false;
     		jumped = true;
     	}
     	else {
-    		position += 2;
+    		for (Cube cube:cubes) {
+    			if (intersectUserTop(cube)) {
+    				startJump = 0;
+    	    		jumping = false;
+    	    		jumped = true;
+    	    		position -= cubeSpeed;
+    				break;
+    			}
+    		}
+    		if (!jumped) {
+    			position += userSpeed;
+    		}
     	}
     }
     
+    private void Fall() {
+    	boolean collision = false;
+    	for (Cube cube:cubes) {
+			if (!jumping && intersectUserBot(cube)) {
+				position = cube.cubeY - height / 3 - 1;
+				collision = true;
+				if (!cube.collisionCube){
+					userSpeed = cubeSpeed;
+				}
+				break;
+			}
+    	}
+    	if (!jumping && position > 0 && !collision) {
+    		position -= userSpeed;
+    	}
+    }
+    
+    private boolean intersectUserBot(Cube cube) {
+    	boolean collision = false;
+    	if (position + height / 3 <= cube.cubeY && position + height / 3 >= cube.cubeY - userSpeed) {
+			int xLeft = (int) x;
+			int xMiddle = (int) (x + userWidth / 2);
+			int xRight = (int) (x + userWidth);
+			for(int i = 0; i < cube.cubeWidth; i++){
+    			if (xLeft == cube.cubeX + i || 
+    					xMiddle == cube.cubeX + i || 
+    					xRight == cube.cubeX + i) 
+    			{
+    				collision = true;
+    			}
+    		}
+		}
+		return collision;
+    }
+    
+    private boolean intersectUserTop(Cube cube) {
+    	boolean collision = false;
+    	if (position + height / 3 + userHeight >= cube.cubeY - cube.cubeHeight && position + height / 3 + userHeight <= cube.cubeY - cube.cubeHeight + userSpeed) {
+			int xLeft = (int) x;
+			int xMiddle = (int) (x + userWidth / 2);
+			int xRight = (int) (x + userWidth);
+			for(int i = 0; i < cube.cubeWidth; i++){
+    			if (xLeft == cube.cubeX + i || 
+    					xMiddle == cube.cubeX + i || 
+    					xRight == cube.cubeX + i) 
+    			{
+    				collision = true;
+    			}
+    		}
+		}
+		return collision;
+    }
+    
     class GameView extends View {
-    	Paint paintUser = new Paint();
+    	int userID = getResources().getIdentifier("stick", "drawable", getPackageName());
+		Bitmap userImage = BitmapFactory.decodeResource(getResources(), userID);
+		Bitmap userImageScaled = Bitmap.createScaledBitmap(userImage, userWidth, userHeight, true);
     	int floorID = getResources().getIdentifier("floor", "drawable", getPackageName());
 		Bitmap floor = BitmapFactory.decodeResource(getResources(), floorID);
 		Bitmap floorScaled = Bitmap.createScaledBitmap(floor, width, height / 3, true);
 		public GameView(Context context) {
 			super(context);
-			paintUser.setColor(Color.BLUE);
 		}
 		
 		@Override
 		protected void onDraw(Canvas c) {
 			c.drawColor(Color.WHITE);
+			if (position <= height / 3) {
+				c.drawBitmap(floorScaled, 0, height / 3 * 2 + position, null);
+			}
 			for (Cube cube: cubes) {
-				if (position <= height / 3) {
-					c.drawBitmap(floorScaled, 0, height / 3 * 2 + position, null);
-				}
-				if (cube.cubeY - position >= -cube.cubeHeight && cube.cubeY - position <= height) {
+				if (cube.cubeY - position >= 0 && cube.cubeY - position <= height + cube.cubeHeight) {
 					c.drawBitmap(cube.block, cube.cubeX, height - cube.cubeY + position, null);
 				}
 			}
-            c.drawCircle(x, height / 3 * 2, radius, paintUser);
+            c.drawBitmap(userImage, x, height / 3 * 2 - userHeight, null);
+            pixelMap = this.getDrawingCache(true);
             invalidate();
         }
 		
