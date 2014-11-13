@@ -12,9 +12,7 @@ import android.view.View;
 import android.widget.Toast;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
-import android.graphics.Paint;
 import android.graphics.Color;
 import android.graphics.Canvas;
 import android.graphics.Point;
@@ -29,7 +27,6 @@ public class MainGame extends Activity implements SensorEventListener{
 	
 	private float x, angle;
 	private int startJump;
-	private int radius = 50;
 	private SensorManager sensorManager;
 	Sensor accelerometer;
 	Toast toast;
@@ -54,10 +51,6 @@ public class MainGame extends Activity implements SensorEventListener{
 		width = size.x;
 		userWidth = 100;
 		userHeight = 150;
-		Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
-		pixelMap = Bitmap.createBitmap(width, height, conf); // this creates a MUTABLE bitmap
-		Canvas canvas = new Canvas(pixelMap);
-		canvas.drawColor(Color.WHITE);
 		super.onCreate(savedInstanceState);
 		setContentView(new GameView(this));
 		sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
@@ -66,7 +59,7 @@ public class MainGame extends Activity implements SensorEventListener{
 		display.getSize(size);
 		height = size.y;
 		width = size.x;
-		x = (width - radius) / 2;
+		x = (width - userWidth) / 2;
 		timer = new Handler();
 		startJump = 0;
 		jumpMilliSeconds = 500;
@@ -171,15 +164,15 @@ public class MainGame extends Activity implements SensorEventListener{
  				speed = 8;
  			}
  			x -= speed;
- 			if (x <= 0 - radius / 2) {
- 				x = width - radius / 2;
+ 			if (x <= 0 - userWidth / 2) {
+ 				x = width - userWidth / 2;
  			}
- 			else if (x >= width - radius / 2) {
- 				x = 0 - radius / 2;
+ 			else if (x >= width - userWidth / 2) {
+ 				x = 0 - userWidth / 2;
  			}
  		}
  	}
- 
+ 	
     private void Jump() {
     	startJump++;
     	jumping = true;
@@ -191,14 +184,25 @@ public class MainGame extends Activity implements SensorEventListener{
     		jumped = true;
     	}
     	else {
-    		position += userSpeed;
+    		for (Cube cube:cubes) {
+    			if (intersectUserTop(cube)) {
+    				startJump = 0;
+    	    		jumping = false;
+    	    		jumped = true;
+    	    		position -= cubeSpeed;
+    				break;
+    			}
+    		}
+    		if (!jumped) {
+    			position += userSpeed;
+    		}
     	}
     }
     
     private void Fall() {
     	boolean collision = false;
     	for (Cube cube:cubes) {
-			if (!jumping && intersectUser(cube)) {
+			if (!jumping && intersectUserBot(cube)) {
 				position = cube.cubeY - height / 3 - 1;
 				collision = true;
 				if (!cube.collisionCube){
@@ -212,9 +216,9 @@ public class MainGame extends Activity implements SensorEventListener{
     	}
     }
     
-    private boolean intersectUser(Cube cube) {
+    private boolean intersectUserBot(Cube cube) {
     	boolean collision = false;
-    	if (position + height / 3 <= cube.cubeY && position + height / 3 >= cube.cubeY - userSpeed + 5) {
+    	if (position + height / 3 <= cube.cubeY && position + height / 3 >= cube.cubeY - userSpeed) {
 			int xLeft = (int) x;
 			int xMiddle = (int) (x + userWidth / 2);
 			int xRight = (int) (x + userWidth);
@@ -228,7 +232,24 @@ public class MainGame extends Activity implements SensorEventListener{
     		}
 		}
 		return collision;
-    	
+    }
+    
+    private boolean intersectUserTop(Cube cube) {
+    	boolean collision = false;
+    	if (position + height / 3 + userHeight >= cube.cubeY - cube.cubeHeight && position + height / 3 + userHeight <= cube.cubeY - cube.cubeHeight + userSpeed) {
+			int xLeft = (int) x;
+			int xMiddle = (int) (x + userWidth / 2);
+			int xRight = (int) (x + userWidth);
+			for(int i = 0; i < cube.cubeWidth; i++){
+    			if (xLeft == cube.cubeX + i || 
+    					xMiddle == cube.cubeX + i || 
+    					xRight == cube.cubeX + i) 
+    			{
+    				collision = true;
+    			}
+    		}
+		}
+		return collision;
     }
     
     class GameView extends View {
