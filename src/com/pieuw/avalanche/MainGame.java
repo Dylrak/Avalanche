@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Toast;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.Paint;
 import android.graphics.Color;
@@ -39,9 +40,15 @@ public class MainGame extends Activity implements SensorEventListener{
 	Handler timer;
 	ArrayList<Cube> cubes = new ArrayList<Cube>();
 	Random random = new Random();
+	int position;
+	int startPosition;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		display = getWindowManager().getDefaultDisplay();
+		display.getSize(size);
+		height = size.y;
+		width = size.x;
 		super.onCreate(savedInstanceState);
 		setContentView(new GameView(this));
 		sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
@@ -56,6 +63,8 @@ public class MainGame extends Activity implements SensorEventListener{
 		startJump = 0;
 		timer.postDelayed(runnableMove, 10);
 		timer.postDelayed(runnableSpawnCube, 2000);
+		position = 0;
+		startPosition = position;
 	}
 	
 	protected void onResume() {
@@ -109,8 +118,8 @@ public class MainGame extends Activity implements SensorEventListener{
     	Bitmap block = BitmapFactory.decodeResource(getResources(), resID);
     	
     	int size = random.nextInt(100 - 80) + 80;
-    	int position = random.nextInt(width - size - 5) + 5;
-    	cubes.add(new Cube(position, size, size, size, block));
+    	int positionX = random.nextInt(width - size - 5) + 5;
+    	cubes.add(new Cube(positionX, position + height, size, size, block));
     }
     
     private void MoveCube() {
@@ -126,10 +135,10 @@ public class MainGame extends Activity implements SensorEventListener{
     			}
     			index1++;
     		}
-    		if (!collisionCube && cube.cubeY < height - cube.cubeWidth) {
-    			cube.cubeY += 10;
-    			if (cube.cubeY > height - cube.cubeHeight) {
-    				cube.cubeY = height - cube.cubeHeight;
+    		if (!collisionCube && cube.cubeY > height / 3 + cube.cubeHeight) {
+    			cube.cubeY -= 10;
+    			if (cube.cubeY < height / 3 + cube.cubeHeight) {
+    				cube.cubeY = height / 3 + cube.cubeHeight;
     			}
     		}
     		index++;
@@ -156,13 +165,13 @@ public class MainGame extends Activity implements SensorEventListener{
     	startJump++;
     	jumping = true;
     	jumped = false;
-    	if (startJump >= 200) {
+    	if (startJump >= 100) {
     		startJump = 0;
     		jumping = false;
     		jumped = true;
     	}
     	else {
-    		y -= -0.2372 * startJump + 23.72;
+    		position += 2;
     	}
     }
     
@@ -179,10 +188,11 @@ public class MainGame extends Activity implements SensorEventListener{
 		protected void onDraw(Canvas c) {
 			c.drawColor(Color.WHITE);
 			for (Cube cube: cubes) {
-				/*Can't parse "block" from SpawnCube to here. Please fix.*/
-				c.drawBitmap(cube.block, cube.cubeX, cube.cubeY, paintCube);
+				if (cube.cubeY - position >= 0 && cube.cubeY - position <= height) {
+					c.drawBitmap(cube.block, cube.cubeX, height - cube.cubeY + position, paintCube);
+				}
 			}
-            c.drawCircle(x, y, radius, paintUser);
+            c.drawCircle(x, height / 3 * 2, radius, paintUser);
             invalidate();
         }
 		
@@ -210,7 +220,7 @@ public class MainGame extends Activity implements SensorEventListener{
     	
     	public boolean intersect(Cube cube) {
     		boolean intersected = false;
-    		if (cubeY + cubeHeight >= cube.cubeY) {
+    		if (cubeY <= cube.cubeY + cube.cubeHeight) {
     			int xLeft = cubeX;
     			int xMiddle = cubeX + cubeWidth / 2;
     			int xRight = cubeX + cubeWidth;
