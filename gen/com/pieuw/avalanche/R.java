@@ -30,6 +30,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int block_5=0x7f020005;
         public static final int floor=0x7f020006;
         public static final int ic_launcher=0x7f020007;
+        public static final int stick=0x7f020008;
     }
     public static final class id {
         public static final int anchor_1=0x7f070005;
