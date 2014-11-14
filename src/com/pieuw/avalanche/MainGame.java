@@ -15,6 +15,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Point;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -33,15 +34,15 @@ public class MainGame extends Activity implements SensorEventListener{
 	Display display;
 	Point size = new Point();
 	int width, height;
-	boolean jumping = false, jumped = false;
+	boolean jumping = false, jumped = true;
 	Handler timer;
 	ArrayList<Cube> cubes = new ArrayList<Cube>();
 	Random random = new Random();
 	int position;
 	int jumpMilliSeconds;
 	int userWidth, userHeight;
-	Bitmap pixelMap;
 	float userSpeed = 0, cubeSpeed = 0;
+	boolean dead = false;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +51,7 @@ public class MainGame extends Activity implements SensorEventListener{
 		height = size.y;
 		width = size.x;
 		userWidth = 100;
-		userHeight = 150;
+		userHeight = 78;
 		super.onCreate(savedInstanceState);
 		setContentView(new GameView(this));
 		sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
@@ -90,20 +91,26 @@ public class MainGame extends Activity implements SensorEventListener{
     private Runnable runnableJump = new Runnable() {
     	   @Override
     	   public void run() {
-    	      Jump();
-    	      timer.postDelayed(this, 10);
-    	      if (jumped) {
-    	    	  timer.removeCallbacks(runnableJump);
-    	      }
+    		   if (!dead) {
+    			  Jump();
+         	      if (!jumping) {
+         	    	  timer.removeCallbacks(runnableJump);
+         	      } else {
+         	    	 timer.postDelayed(this, 10);
+         	      }
+    		  }
     	   }
     };
     
     private Runnable runnableMove = new Runnable() {
  	   		@Override
  	   		public void run() {
+ 	   			if (!dead) {
  	   			Move();
  	   			Fall();
+ 	   			Dead();
  	   			timer.postDelayed(this, 10);
+ 	   		}
  	   }
     };
     
@@ -174,51 +181,70 @@ public class MainGame extends Activity implements SensorEventListener{
  	}
  	
     private void Jump() {
+    	jumped = false;
     	startJump++;
     	jumping = true;
-    	jumped = false;
     	userSpeed = 20.0F;
     	if (startJump >= jumpMilliSeconds / 10) {
-    		startJump = 0;
     		jumping = false;
-    		jumped = true;
     	}
     	else {
     		for (Cube cube:cubes) {
-    			if (intersectUserTop(cube)) {
-    				startJump = 0;
-    	    		jumping = false;
-    	    		jumped = true;
-    	    		position -= cubeSpeed;
-    				break;
+    			if (cube.cubeY - position >= -500 && cube.cubeY - position <= height + cube.cubeHeight + 500) {
+    				if (intersectUserTop(cube)) {
+        	    		position -= userSpeed;
+        	    		jumping = false;
+        				break;
+        			}
     			}
     		}
-    		if (!jumped) {
+    		if (jumping) {
     			position += userSpeed;
     		}
     	}
     }
     
+    private void Dead() {
+    	for (Cube cube:cubes){
+    		if (cube.cubeY - position >= -500 && cube.cubeY - position <= height + cube.cubeHeight + 500) {
+    			if (intersectUserTop(cube) && intersectUserBot(cube)) {
+    				dead = true;
+    			}
+    		}
+    	}
+    	
+    }
+    
     private void Fall() {
     	boolean collision = false;
     	for (Cube cube:cubes) {
-			if (!jumping && intersectUserBot(cube)) {
-				position = cube.cubeY - height / 3 - 1;
-				collision = true;
-				if (!cube.collisionCube){
-					userSpeed = cubeSpeed;
-				}
-				break;
-			}
+    		if (cube.cubeY - position >= -500 && cube.cubeY - position <= height + cube.cubeHeight + 500) {
+    			if (intersectUserBot(cube)) {
+    				position = cube.cubeY - height / 3 - 1;
+    				jumped = true;
+    				collision = true;
+    				if (!cube.collisionCube){
+    					userSpeed = cubeSpeed;
+    				}
+    				break;
+    			}
+    		}
     	}
     	if (!jumping && position > 0 && !collision) {
     		position -= userSpeed;
+    		if (position < 0) {
+    			position = 0;
+    		}
+    	}
+    	if (position == 0) {
+    		jumping = false;
+    		jumped = true;
     	}
     }
     
     private boolean intersectUserBot(Cube cube) {
     	boolean collision = false;
-    	if (position + height / 3 <= cube.cubeY && position + height / 3 >= cube.cubeY - userSpeed) {
+    	if (position + height / 3 <= cube.cubeY && position + height / 3 >= cube.cubeY - userSpeed * 2) {
 			int xLeft = (int) x;
 			int xMiddle = (int) (x + userWidth / 2);
 			int xRight = (int) (x + userWidth);
@@ -236,7 +262,7 @@ public class MainGame extends Activity implements SensorEventListener{
     
     private boolean intersectUserTop(Cube cube) {
     	boolean collision = false;
-    	if (position + height / 3 + userHeight >= cube.cubeY - cube.cubeHeight && position + height / 3 + userHeight <= cube.cubeY - cube.cubeHeight + userSpeed) {
+    	if (position + height / 3 + userHeight >= cube.cubeY - cube.cubeHeight && position + height / 3 + userHeight <= cube.cubeY - cube.cubeHeight + userSpeed * 2) {
 			int xLeft = (int) x;
 			int xMiddle = (int) (x + userWidth / 2);
 			int xRight = (int) (x + userWidth);
@@ -253,14 +279,17 @@ public class MainGame extends Activity implements SensorEventListener{
     }
     
     class GameView extends View {
-    	int userID = getResources().getIdentifier("stick", "drawable", getPackageName());
+    	int userID = getResources().getIdentifier("user", "drawable", getPackageName());
 		Bitmap userImage = BitmapFactory.decodeResource(getResources(), userID);
 		Bitmap userImageScaled = Bitmap.createScaledBitmap(userImage, userWidth, userHeight, true);
     	int floorID = getResources().getIdentifier("floor", "drawable", getPackageName());
 		Bitmap floor = BitmapFactory.decodeResource(getResources(), floorID);
 		Bitmap floorScaled = Bitmap.createScaledBitmap(floor, width, height / 3, true);
+		Paint textColor = new Paint();
 		public GameView(Context context) {
 			super(context);
+			textColor.setColor(Color.BLUE);
+			textColor.setTextSize(16);
 		}
 		
 		@Override
@@ -271,18 +300,20 @@ public class MainGame extends Activity implements SensorEventListener{
 			}
 			for (Cube cube: cubes) {
 				if (cube.cubeY - position >= 0 && cube.cubeY - position <= height + cube.cubeHeight) {
-					c.drawBitmap(cube.block, cube.cubeX, height - cube.cubeY + position, null);
+					c.drawBitmap(cube.block, cube.cubeX, height - (cube.cubeY - position), null);
 				}
 			}
             c.drawBitmap(userImage, x, height / 3 * 2 - userHeight, null);
-            pixelMap = this.getDrawingCache(true);
+            long points = position * 1000 / height;
+            c.drawText(String.valueOf(points), width / 2, 100, textColor);
             invalidate();
         }
 		
 		@Override
 		public boolean onTouchEvent(MotionEvent event) {
 			if (event.getAction() == MotionEvent.ACTION_DOWN) {
-	    		if (!jumping) {
+	    		if (jumped) {
+	    			startJump = 0;
 	        		timer.postDelayed(runnableJump, 10);
 	    		}
 	    	}
