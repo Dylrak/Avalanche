@@ -136,7 +136,7 @@ public class MainGame extends Activity implements SensorEventListener{
     	int resID = getResources().getIdentifier(randBlock, "drawable", getPackageName());
     	Bitmap block = BitmapFactory.decodeResource(getResources(), resID);
     	
-    	int size = random.nextInt(500 - 300) + 300;
+    	int size = (random.nextInt(3 - 1) + 1) * 100;
     	int positionX = random.nextInt(width - size - 5) + 5;
     	cubes.add(new Cube(positionX, position + height + size, size, size, block));
     }
@@ -165,7 +165,13 @@ public class MainGame extends Activity implements SensorEventListener{
     }
     
  	private void Move() {
- 		if (angle < -1.5 || angle > 1.5) {
+ 		boolean collision = false;
+ 		for (Cube cube:cubes) {
+ 			if ((intersectUserLeft(cube) && angle > 1.5) || (intersectUserRight(cube) && angle < -1.5)) {
+ 				collision = true;
+ 			}
+ 		}
+ 		if ((angle < -1.5 || angle > 1.5) && collision == false) {
  			float speed = angle;
  			if (angle > 8) {
  				speed = 8;
@@ -275,6 +281,22 @@ public class MainGame extends Activity implements SensorEventListener{
     			}
     		}
 		}
+		return collision;
+    }
+    
+    private boolean intersectUserLeft(Cube cube) {
+    	boolean collision = false;
+    	
+    	/**INSERT CODE HERE**/
+    	
+		return collision;
+    }
+    
+    private boolean intersectUserRight(Cube cube) {
+    	boolean collision = false;
+    	
+    	/**INSERT CODE HERE**/
+    	
 		return collision;
     }
     
