@@ -22,10 +22,8 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
-
+//sensorevent = scherm kantelen
 public class MainGame extends Activity implements SensorEventListener{
-
-	
 	private float x, angle;
 	private int startJump;
 	private SensorManager sensorManager;
@@ -53,40 +51,57 @@ public class MainGame extends Activity implements SensorEventListener{
 		userWidth = 100;
 		userHeight = 78;
 		super.onCreate(savedInstanceState);
+		//maakt nieuwe view aan
 		setContentView(new GameView(this));
+		//sensor voor als je het scherm beweegt
 		sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+		//sensor voor de x hoek van de mobiel
 		accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 		display = getWindowManager().getDefaultDisplay();
 		display.getSize(size);
+		//hoogte van het scherm
 		height = size.y;
+		//breedte van het scherm
 		width = size.x;
+		//zet user in het midden
 		x = (width - userWidth) / 2;
 		timer = new Handler();
+		//integer om het springen niet unlimited door te laten gaan
 		startJump = 0;
+		//hoe lang je omhoog springt
 		jumpMilliSeconds = 500;
+		//start timer om te bewegen
 		timer.postDelayed(runnableMove, 10);
+		//timer om cubes te spawnen
 		timer.postDelayed(runnableSpawnCube, 2000);
+		//timer om de cubes te bewegen zolang er geen collision is
 		timer.postDelayed(runnableCubeMove, 10);
+		//normale y waarde van de onderkant van het scherm is (onderkant y => 0)
 		position = 0;
 		userSpeed = 20.0F;
 		cubeSpeed = 10.0F;
 	}
 	
+	//wanneer het scherm bewogen wordt
 	protected void onResume() {
         super.onResume();
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
     }
 	
+	//wanneer het scherm niet bewogen wordt
     protected void onPause() {
         super.onPause();
         sensorManager.unregisterListener(this);
     }
 	
+    //doet niks
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 	
+	//berekent onder welke x hoek het scherm zit
     public void onSensorChanged(SensorEvent event) {
     	angle = event.values[0] * 2;
     }
+    
     
     private Runnable runnableJump = new Runnable() {
     	   @Override
@@ -99,25 +114,40 @@ public class MainGame extends Activity implements SensorEventListener{
          	    	 timer.postDelayed(this, 10);
          	      }
     		  }
+    		   else {
+    			   jumped = false;
+    			   jumping = true;
+    			   timer.removeCallbacks(runnableJump);
+    		   }
     	   }
     };
     
     private Runnable runnableMove = new Runnable() {
  	   		@Override
  	   		public void run() {
- 	   			if (!dead) {
- 	   			Move();
- 	   			Fall();
+ 	   			//checkt voor top en bot collision tegelijk aka dead
  	   			Dead();
- 	   			timer.postDelayed(this, 10);
- 	   		}
+ 	   			if (!dead) {
+ 	   				//beweegt x van user
+ 	   				Move();
+ 	   				//zo lang er geen collision en niet gesprongen wordt valt de user
+ 	   				Fall();
+ 	   				//doet dit elke 10ms
+ 	   				timer.postDelayed(this, 10);
+ 	   			}
+ 	   			else {
+ 	   				//als user dead is dan verwijder beweeg timer
+ 	   				timer.removeCallbacks(runnableMove);
+ 	   			}
  	   }
     };
     
     private Runnable runnableCubeMove = new Runnable() {
 	   		@Override
 	   		public void run() {
+	   			//beweegt cube en checkt voor collision
 	   			MoveCube();
+	   			//doet dit elke 10ms
 	   			timer.postDelayed(this, 10);
 	   }
     };
@@ -125,8 +155,10 @@ public class MainGame extends Activity implements SensorEventListener{
     private Runnable runnableSpawnCube = new Runnable() {
 	   		@Override
 	   		public void run() {
+	   			//spawnt cube
 	   			SpawnCube();
-	   			timer.postDelayed(this, 5000);
+	   			//doet dit elke 3.5 secondes
+	   			timer.postDelayed(this, 3500);
 	   }
     };
     
@@ -146,7 +178,9 @@ public class MainGame extends Activity implements SensorEventListener{
     	for (Cube cube:cubes) {
     		int index1 = 0;
     		for (Cube collision:cubes) {
+    			//als cube niet zichzelf is en geen collision heeft
     			if (index != index1 && !cube.collisionCube) {
+    				//kijk voor collision met andere cubes
     				cube.intersect(collision);
     				if (cube.collisionCube) {
     					cube.cubeY = collision.cubeY + cube.cubeHeight;
@@ -154,6 +188,7 @@ public class MainGame extends Activity implements SensorEventListener{
         		}
     			index1++;
     		}
+    		//checkt voor collision met grond en anders laat cube bewegen
     		if (!cube.collisionCube && cube.cubeY > height / 3 + cube.cubeHeight) {
     			cube.cubeY -= cubeSpeed;
     			if (cube.cubeY < height / 3 + cube.cubeHeight) {
@@ -165,12 +200,16 @@ public class MainGame extends Activity implements SensorEventListener{
     }
     
  	private void Move() {
+ 		//draai angle gaat ongeveer van 10 tot -10
  		if (angle < -1.5 || angle > 1.5) {
  			float speed = angle;
  			if (angle > 8) {
  				speed = 8;
+ 			} else if (angle < -8) {
+ 				speed = -8;
  			}
  			x -= speed;
+ 			//door de muren
  			if (x <= 0 - userWidth / 2) {
  				x = width - userWidth / 2;
  			}
@@ -189,7 +228,9 @@ public class MainGame extends Activity implements SensorEventListener{
     		jumping = false;
     	}
     	else {
+    		//loopt door elke cube
     		for (Cube cube:cubes) {
+    			//kijk of de cube zich op het veld bevindt
     			if (cube.cubeY - position >= -500 && cube.cubeY - position <= height + cube.cubeHeight + 500) {
     				if (intersectUserTop(cube)) {
         	    		position -= userSpeed;
