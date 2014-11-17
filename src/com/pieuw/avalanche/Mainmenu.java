@@ -38,5 +38,15 @@ public class Mainmenu extends Activity {
         	}
         
         });
+        
+        final Button loadout = (Button) findViewById(R.id.loadout);
+        loadout.setOnClickListener(new View.OnClickListener() {
+        	@Override
+        	public void onClick (View v) {
+        		Intent intent = new Intent (Mainmenu.this, Loadout.class);
+        		Mainmenu.this.startActivity (intent);        	
+        	}
+        	
+        });
     }
 };
