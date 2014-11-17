@@ -200,10 +200,6 @@ public class MainGame extends Activity implements SensorEventListener{
     }
     
  	private void Move() {
-<<<<<<< HEAD
- 		//draai angle gaat ongeveer van 10 tot -10
- 		if (angle < -1.5 || angle > 1.5) {
-=======
  		boolean collision = false;
  		for (Cube cube:cubes) {
  			if ((intersectUserLeft(cube) && angle > 1.5) || (intersectUserRight(cube) && angle < -1.5)) {
@@ -211,7 +207,6 @@ public class MainGame extends Activity implements SensorEventListener{
  			}
  		}
  		if ((angle < -1.5 || angle > 1.5) && collision == false) {
->>>>>>> origin/master
  			float speed = angle;
  			if (angle > 8) {
  				speed = 8;
