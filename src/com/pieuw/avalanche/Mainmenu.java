@@ -33,7 +33,9 @@ public class Mainmenu extends Activity {
         storebutton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				/** Insert Code */
+				Intent store_intent = new Intent(Mainmenu.this, Store.class);
+				startActivity(store_intent);
+				
 				
 			}
         });
