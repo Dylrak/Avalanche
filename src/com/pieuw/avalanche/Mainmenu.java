@@ -29,6 +29,15 @@ public class Mainmenu extends Activity {
         
         setContentView(R.layout.activity_mainmenu);
         
+        final Button storebutton = (Button) findViewById(R.id.store);
+        storebutton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				/** Insert Code */
+				
+			}
+        });
+        
         final Button startGame = (Button) findViewById(R.id.start_game);
         startGame.setOnClickListener(new View.OnClickListener() {
         	@Override
