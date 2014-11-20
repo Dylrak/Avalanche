@@ -7,7 +7,7 @@
     android:background="#0099cc"
     tools:context="com.pieuw.avalanche.Loadout" >
 
-    <ImageView
+    <Button
         android:id="@+id/lava_immunity"
         android:clickable="true"
         android:layout_width="wrap_content"
@@ -22,7 +22,7 @@
    	    android:layout_width="wrap_content"
    	    android:layout_height="wrap_content"
    	    android:layout_alignBottom="@+id/lava_immunity"
-   	    android:layout_toRightof="@+id/lava_immunity"
+   	    android:layout_toRightOf="@+id/lava_immunity"
    	    android:layout_alignParentTop="true"
    	    android:layout_alignRight="@+id/lava_immunity"
    	    android:background="@drawable/block_immunity"
