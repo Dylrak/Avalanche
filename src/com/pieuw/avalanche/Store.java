@@ -1,8 +1,8 @@
 package com.pieuw.avalanche;
 
-import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.File;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
@@ -23,7 +23,12 @@ public class Store extends Activity{
 	
 	public void storesave(View view){
 		
-		FileOutputStream store_out = openFileOutput("/** Location to be set*/", MODE_PRIVATE); 
+		try {
+			FileOutputStream store_out = openFileOutput("/** Location to be set*/", MODE_PRIVATE);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
 		/** Outputstream to file where info about ingame credits can be stored for use */
 	
 	five_euros.setOnClickListener(new View.OnClickListener() {
