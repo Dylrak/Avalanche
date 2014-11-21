@@ -47,21 +47,26 @@
         android:background="@drawable/button"/>
 	
 	<Button
-        android:id="@+id/passive_1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:text="@string/start_game" 
-        android:background="@drawable/button"/>
+	    android:id="@+id/passive_1"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_above="@+id/anchor_1"
+	    android:layout_toLeftOf="@+id/anchor_1"
+	    android:text="@string/start_game" />
 	
 	<Button
-        android:id="@+id/passive_2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:text="@string/start_game" 
-        android:background="@drawable/button"/>
+	    android:id="@+id/passive_2"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_above="@+id/anchor_1"
+	    android:layout_toRightOf="@+id/anchor_1"
+	    android:text="@string/start_game" />
+	
+	<TextView
+	    android:id="@+id/anchor_1"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_centerVertical="true"
+	    android:layout_centerHorizontal="true"/>
 
 </RelativeLayout>
