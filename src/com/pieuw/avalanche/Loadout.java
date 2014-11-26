@@ -12,13 +12,7 @@ public class Loadout extends Activity {
 	public static String FILENAME = "preferences";
 	int passive1, passive2, inValues, i, current_passive;
 	SharedPreferences preferences;
-	
-	final Button passive_1 = (Button) findViewById(R.id.passive_1);
-	final Button passive_2 = (Button) findViewById(R.id.passive_2);
-	final Button lavaImmunity = (Button) findViewById(R.id.lava_immunity);
-	final Button blockImmunity = (Button) findViewById(R.id.block_immunity);
-	final Button doubleJump = (Button) findViewById(R.id.double_jump);
-	final Button icarusBoots = (Button) findViewById(R.id.icarus_boots);
+	Button passive_1, passive_2, lavaImmunity, blockImmunity, doubleJump, icarusBoots;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -27,11 +21,29 @@ public class Loadout extends Activity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
         WindowManager.LayoutParams.FLAG_FULLSCREEN);
-	    
     	
 		setContentView(R.layout.activity_loadout);
 
+		passive_1 = (Button) findViewById(R.id.passive_1);
+		passive_2 = (Button) findViewById(R.id.passive_2);
+		lavaImmunity = (Button) findViewById(R.id.lava_immunity);
+		blockImmunity = (Button) findViewById(R.id.block_immunity);
+		doubleJump = (Button) findViewById(R.id.double_jump);
+		icarusBoots = (Button) findViewById(R.id.icarus_boots);
+		
+		preferences = getSharedPreferences(FILENAME, 0);
+		SharedPreferences.Editor editor = preferences.edit();
+		passive1 = preferences.getInt("passive_1", 0);
+		passive2 = preferences.getInt("passive_2", 0);
+		editor.commit();
+		
 		refreshPassives ();
+		
+		int xy = lavaImmunity.getWidth();
+		lavaImmunity.setHeight(xy);
+		blockImmunity.setHeight(xy);
+		doubleJump.setHeight(xy);
+		icarusBoots.setHeight(xy);
 		
 		/**1. Lava Immunity**/ 
 		/**2. Block Immunity**/ 
@@ -113,10 +125,9 @@ public class Loadout extends Activity {
 	}
 	
 	public void refreshPassives () {
-		preferences = getSharedPreferences(FILENAME, 0);
 		SharedPreferences.Editor editor = preferences.edit();
-		passive1 = preferences.getInt("passive_1", 0);
-		passive2 = preferences.getInt("passive_2", 0);
+		editor.putInt("passive_1", passive1);
+		editor.putInt("passive_2", passive2);
 		editor.commit();
 		passive_1.setEnabled(false);
 		passive_2.setEnabled(false);
@@ -128,6 +139,8 @@ public class Loadout extends Activity {
 			passive_1.setBackgroundResource(R.drawable.double_jump);
 		} else if (passive1 == 4) {
 			passive_1.setBackgroundResource(R.drawable.icarus_boots);
+		} else {
+			passive_1.setBackgroundResource(R.drawable.standard);
 		}
 		if (passive2 == 1) {
 			passive_2.setBackgroundResource(R.drawable.lava_immunity);
@@ -137,6 +150,8 @@ public class Loadout extends Activity {
 			passive_2.setBackgroundResource(R.drawable.double_jump);
 		} else if (passive2 == 4) {
 			passive_2.setBackgroundResource(R.drawable.icarus_boots);
+		} else {
+			passive_2.setBackgroundResource(R.drawable.standard);
 		}
 	}
 }
