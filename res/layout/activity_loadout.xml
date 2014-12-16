@@ -8,38 +8,34 @@
     tools:context="com.pieuw.avalanche.Loadout" >
 
     <LinearLayout
+        android:id="@+id/linear_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent" 
         android:layout_below="@+id/anchor_1">
 
 	    <Button
 	        android:id="@+id/lava_immunity"
-	        android:clickable="true"
-	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:layout_weight="1"
-	        android:background="@drawable/lava_immunity"/>
+	        android:layout_width="0dp"/>
 	    
 	   	<Button
 	   	    android:id="@+id/block_immunity"
-	   	    android:layout_width="wrap_content"
 	   	    android:layout_height="wrap_content"
 	   	    android:layout_weight="1"
-	   	    android:background="@drawable/block_immunity"/>
+	   	    android:layout_width="0dp"/>
 		
 	   	<Button
 	   	    android:id="@+id/double_jump"
-	   	    android:layout_width="wrap_content"
 	   	    android:layout_height="wrap_content"
 	   	    android:layout_weight="1"
-	   	    android:background="@drawable/double_jump"/>
+	   	    android:layout_width="0dp"/>
 		
 		<Button
 	        android:id="@+id/icarus_boots"
-	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:layout_weight="1"
-	        android:background="@drawable/icarus_boots"/>
+	        android:layout_width="0dp"/>
 	</LinearLayout>
 	
 	<Button
@@ -47,16 +43,14 @@
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
 	    android:layout_above="@+id/anchor_1"
-	    android:layout_toLeftOf="@+id/anchor_1"
-	    android:text="@string/start_game" />
+	    android:layout_toLeftOf="@+id/anchor_1"/>
 	
 	<Button
 	    android:id="@+id/passive_2"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
 	    android:layout_above="@+id/anchor_1"
-	    android:layout_toRightOf="@+id/anchor_1"
-	    android:text="@string/start_game" />
+	    android:layout_toRightOf="@+id/anchor_1"/>
 	
 	<TextView
 	    android:id="@+id/anchor_1"
