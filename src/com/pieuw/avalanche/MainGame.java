@@ -41,6 +41,7 @@ public class MainGame extends Activity implements SensorEventListener{
 	int userWidth, userHeight;
 	float userSpeed = 0, cubeSpeed = 0;
 	boolean dead = false;
+	boolean leftRightCollision = false;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -168,7 +169,7 @@ public class MainGame extends Activity implements SensorEventListener{
     	int resID = getResources().getIdentifier(randBlock, "drawable", getPackageName());
     	Bitmap block = BitmapFactory.decodeResource(getResources(), resID);
     	
-    	int size = (random.nextInt(3 - 1) + 1) * 100;
+    	int size = (random.nextInt(5 - 3) + 3) * 100;
     	int positionX = random.nextInt(width - size - 5) + 5;
     	cubes.add(new Cube(positionX, position + height + size, size, size, block));
     }
@@ -200,18 +201,27 @@ public class MainGame extends Activity implements SensorEventListener{
     }
     
  	private void Move() {
-<<<<<<< HEAD
  		//draai angle gaat ongeveer van 10 tot -10
- 		if (angle < -1.5 || angle > 1.5) {
-=======
- 		boolean collision = false;
- 		for (Cube cube:cubes) {
- 			if ((intersectUserLeft(cube) && angle > 1.5) || (intersectUserRight(cube) && angle < -1.5)) {
- 				collision = true;
- 			}
- 		}
- 		if ((angle < -1.5 || angle > 1.5) && collision == false) {
->>>>>>> origin/master
+		boolean cubeCollision = true;
+		for (Cube cube:cubes) {
+			if (cube.cubeY - position >= -cube.cubeHeight && cube.cubeY - position <= height + cube.cubeHeight * 2) {
+				if ((intersectUserLeft(cube) && angle > 1.5) || (intersectUserRight(cube) && angle < -1.5)) {
+					leftRightCollision = true;
+					jumped = true;
+					jumping = false;
+					if (cube.collisionCube) {
+						cubeCollision = true;
+					} else {
+						cubeCollision = false;
+					}
+					break;
+				}
+				else {
+					leftRightCollision = false;
+				}
+			}
+		}
+ 		if ((angle < -1.5 || angle > 1.5) && !leftRightCollision) {
  			float speed = angle;
  			if (angle > 8) {
  				speed = 8;
@@ -225,6 +235,10 @@ public class MainGame extends Activity implements SensorEventListener{
  			}
  			else if (x >= width - userWidth / 2) {
  				x = 0 - userWidth / 2;
+ 			}
+ 		} else if (leftRightCollision) {
+ 			if (!cubeCollision) {
+ 				position -= cubeSpeed;
  			}
  		}
  	}
@@ -241,13 +255,16 @@ public class MainGame extends Activity implements SensorEventListener{
     		//loopt door elke cube
     		for (Cube cube:cubes) {
     			//kijk of de cube zich op het veld bevindt
-    			if (cube.cubeY - position >= -500 && cube.cubeY - position <= height + cube.cubeHeight + 500) {
+    			if (cube.cubeY - position >= -cube.cubeHeight && cube.cubeY - position <= height + cube.cubeHeight * 2) {
     				if (intersectUserTop(cube)) {
         	    		position -= userSpeed;
         	    		jumping = false;
         				break;
         			}
     			}
+    		}
+    		if (leftRightCollision) {
+    			jumping = false;
     		}
     		if (jumping) {
     			position += userSpeed;
@@ -257,31 +274,30 @@ public class MainGame extends Activity implements SensorEventListener{
     
     private void Dead() {
     	for (Cube cube:cubes){
-    		if (cube.cubeY - position >= -500 && cube.cubeY - position <= height + cube.cubeHeight + 500) {
-    			if (intersectUserTop(cube) && intersectUserBot(cube)) {
+    		if (cube.cubeY - position >= -cube.cubeHeight && cube.cubeY - position <= height + cube.cubeHeight * 2) {
+    			if (intersectDead(cube)) {
     				dead = true;
     			}
     		}
     	}
-    	
     }
     
     private void Fall() {
     	boolean collision = false;
     	for (Cube cube:cubes) {
-    		if (cube.cubeY - position >= -500 && cube.cubeY - position <= height + cube.cubeHeight + 500) {
+    		if (cube.cubeY - position >= 0 && cube.cubeY - position <= height + cube.cubeHeight) {
     			if (intersectUserBot(cube)) {
     				position = cube.cubeY - height / 3 - 1;
     				jumped = true;
     				collision = true;
-    				if (!cube.collisionCube){
+    				if (!cube.collisionCube) {
     					userSpeed = cubeSpeed;
     				}
     				break;
     			}
     		}
     	}
-    	if (!jumping && position > 0 && !collision) {
+    	if (!jumping && position > 0 && !collision && !leftRightCollision) {
     		position -= userSpeed;
     		if (position < 0) {
     			position = 0;
@@ -329,19 +345,44 @@ public class MainGame extends Activity implements SensorEventListener{
 		return collision;
     }
     
-    private boolean intersectUserLeft(Cube cube) {
+    private boolean intersectUserRight(Cube cube) {
     	boolean collision = false;
-    	
-    	/**INSERT CODE HERE**/
-    	
+    	if (x + userWidth >= cube.cubeX && x + userWidth <= cube.cubeX + userSpeed * 2) {
+    		int yTop = height / 3 + userHeight;
+			int yMiddle = height / 3 + userHeight / 2;
+			int yBot = height / 3;
+			for(int i = 0; i < cube.cubeHeight; i++){
+    			if (yTop == cube.cubeY - position - i || 
+    					yMiddle == cube.cubeY - position - i || 
+    					yBot == cube.cubeY - position - i) 
+    			{
+    				collision = true;
+    			}
+    		}
+    	}
 		return collision;
     }
     
-    private boolean intersectUserRight(Cube cube) {
+    private boolean intersectUserLeft(Cube cube) {
     	boolean collision = false;
-    	
-    	/**INSERT CODE HERE**/
-    	
+    	if (x <= cube.cubeX + cube.cubeWidth && x >= cube.cubeX + cube.cubeWidth - userSpeed * 2) {
+    		int yTop = height / 3 + userHeight;
+			int yMiddle = height / 3 + userHeight / 2;
+			int yBot = height / 3;
+			for(int i = 0; i < cube.cubeHeight; i++){
+    			if (yTop == cube.cubeY - position - i || 
+    					yMiddle == cube.cubeY - position - i || 
+    					yBot == cube.cubeY - position - i) 
+    			{
+    				collision = true;
+    			}
+    		}
+    	}
+		return collision;
+    }
+    
+    private boolean intersectDead(Cube cube) {
+    	boolean collision = false;
 		return collision;
     }
     
