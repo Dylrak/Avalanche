@@ -43,6 +43,8 @@ public class MainGame extends Activity implements SensorEventListener{
 	boolean dead = false;
 	boolean leftRightCollision = false;
 	
+	public native void Engine();
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		display = getWindowManager().getDefaultDisplay();
@@ -79,8 +81,9 @@ public class MainGame extends Activity implements SensorEventListener{
 		timer.postDelayed(runnableCubeMove, 10);
 		//normale y waarde van de onderkant van het scherm is (onderkant y => 0)
 		position = 0;
-		userSpeed = 20.0F;
-		cubeSpeed = 10.0F;
+		userSpeed = height * 0.02F;
+		cubeSpeed = userSpeed / 2;
+
 	}
 	
 	//wanneer het scherm bewogen wordt
@@ -158,8 +161,8 @@ public class MainGame extends Activity implements SensorEventListener{
 	   		public void run() {
 	   			//spawnt cube
 	   			SpawnCube();
-	   			//doet dit elke 3.5 secondes
-	   			timer.postDelayed(this, 3500);
+	   			//doet dit elke 2 secondes
+	   			timer.postDelayed(this, 2000);
 	   }
     };
     
@@ -169,7 +172,11 @@ public class MainGame extends Activity implements SensorEventListener{
     	int resID = getResources().getIdentifier(randBlock, "drawable", getPackageName());
     	Bitmap block = BitmapFactory.decodeResource(getResources(), resID);
     	
+<<<<<<< HEAD
     	int size = (random.nextInt(5 - 3) + 3) * 100;
+=======
+    	int size = (int) ((random.nextInt(1) + 1) * (10 * userSpeed));
+>>>>>>> origin/master
     	int positionX = random.nextInt(width - size - 5) + 5;
     	cubes.add(new Cube(positionX, position + height + size, size, size, block));
     }
@@ -201,6 +208,7 @@ public class MainGame extends Activity implements SensorEventListener{
     }
     
  	private void Move() {
+<<<<<<< HEAD
  		//draai angle gaat ongeveer van 10 tot -10
 		boolean cubeCollision = true;
 		for (Cube cube:cubes) {
@@ -222,6 +230,15 @@ public class MainGame extends Activity implements SensorEventListener{
 			}
 		}
  		if ((angle < -1.5 || angle > 1.5) && !leftRightCollision) {
+=======
+ 		boolean collision = false;
+ 		for (Cube cube:cubes) {
+ 			if ((intersectUserLeft(cube) && angle > 1.5) || (intersectUserRight(cube) && angle < -1.5)) {
+ 				collision = true;
+ 			}
+ 		}
+ 		if ((angle < -1.5 || angle > 1.5) && collision == false) {
+>>>>>>> origin/master
  			float speed = angle;
  			if (angle > 8) {
  				speed = 8;
@@ -247,7 +264,6 @@ public class MainGame extends Activity implements SensorEventListener{
     	jumped = false;
     	startJump++;
     	jumping = true;
-    	userSpeed = 20.0F;
     	if (startJump >= jumpMilliSeconds / 10) {
     		jumping = false;
     	}

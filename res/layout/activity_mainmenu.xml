@@ -76,6 +76,7 @@
                 
         <ImageView
             android:id="@+id/coinstack_icon"
+            android:contentDescription="@string/desc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="@id/coins"
@@ -95,6 +96,7 @@
 
     <ImageView
         android:id="@+id/logo"
+        android:contentDescription="@string/desc"
         android:layout_above="@id/start_game"
         android:layout_width="fill_parent"
     	android:layout_height="wrap_content"

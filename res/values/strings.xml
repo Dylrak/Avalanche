@@ -11,5 +11,8 @@
     <string name="options">Options</string>
     <string name="loadout">Loadout</string>
     <string name="coins">50</string>
+    <string name="title_activity_loadout">Loadout</string>
+    <string name="action_settings">Settings</string>
+    <string name="desc"></string>
 
 </resources>

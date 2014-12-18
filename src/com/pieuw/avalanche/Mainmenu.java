@@ -29,6 +29,17 @@ public class Mainmenu extends Activity {
         
         setContentView(R.layout.activity_mainmenu);
         
+        final Button storebutton = (Button) findViewById(R.id.store);
+        storebutton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent store_intent = new Intent(Mainmenu.this, Store.class);
+				startActivity(store_intent);
+				
+				
+			}
+        });
+        
         final Button startGame = (Button) findViewById(R.id.start_game);
         startGame.setOnClickListener(new View.OnClickListener() {
         	@Override
@@ -37,6 +48,16 @@ public class Mainmenu extends Activity {
         		Mainmenu.this.startActivity(intent);
         	}
         
+        });
+        
+        final Button loadout = (Button) findViewById(R.id.loadout);
+        loadout.setOnClickListener(new View.OnClickListener() {
+        	@Override
+        	public void onClick (View v) {
+        		Intent intent = new Intent (Mainmenu.this, Loadout.class);
+        		Mainmenu.this.startActivity (intent);        	
+        	}
+        	
         });
     }
 };
